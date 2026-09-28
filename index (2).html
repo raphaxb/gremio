@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revolução Estudantil em Ação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Fraunces:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#f0f4f2;--surface:#fbfdfb;--ink:#1f1a2e;--sub:#5f5b70;--roxo:#5b2a9c;--roxo-l:#ece4fa;--line:#e2e6e4;--ok:#1e8a5a;--warn:#b7791f;--btn:#5b2a9c;box-sizing:border-box}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15111d;--surface:#211a2e;--ink:#f2ecfa;--sub:#b8a8cf;--roxo:#b58cf0;--roxo-l:#2e2140;--line:#34294a;--ok:#4cc38a;--warn:#e0b04a;--btn:#7a3fd1}}
+:root[data-theme="dark"]{--bg:#15111d;--surface:#211a2e;--ink:#f2ecfa;--sub:#b8a8cf;--roxo:#b58cf0;--roxo-l:#2e2140;--line:#34294a;--ok:#4cc38a;--warn:#e0b04a;--btn:#7a3fd1}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif}
+h1,h2,h3{font-family:Manrope,system-ui,sans-serif;font-weight:800;margin:.2em 0 .4em;line-height:1.15}
+h2{font-size:1.25rem}h3{font-size:1.05rem}
+p{line-height:1.5;color:var(--sub);margin:.4em 0}
+.hero{background:linear-gradient(160deg,#4a1f8a,#6a35b8);color:#fff;border-radius:0 0 26px 26px;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 22px}
+.hero .eyebrow{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;opacity:.85;font-weight:600}
+.hero h1{font-size:1.9rem;margin:.25em 0}
+.hero .sub{color:#fff;opacity:.9;font-size:.88rem;margin:0}
+.hero-login{display:inline-block;margin-top:12px;font-size:.75rem;color:#fff;opacity:.8}
+main{padding:16px 16px 110px;max-width:640px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(30,20,50,.06)}
+.pill{display:block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--roxo);margin-bottom:6px}
+.tag{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ok)}
+.tag.plan{color:var(--warn)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .card{margin:0}
+.sc{text-align:center;cursor:pointer;font-family:Manrope;color:var(--ink);width:100%}
+.sc .ic{font-size:1.6rem}.sc b{display:block;margin-top:4px}
+.row{display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;font-family:Manrope;color:var(--ink);font-size:1rem}
+.row span.ic{font-size:1.4rem}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px}
+.sec-head a,.back{color:var(--roxo);font-weight:700;font-size:.85rem;cursor:pointer;text-decoration:none}
+.back{display:inline-block;margin-bottom:8px}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--roxo-l);color:var(--roxo);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;margin-bottom:8px}
+label{display:block;font-size:.82rem;color:var(--sub);margin:10px 0 4px}
+input,textarea,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:Manrope;font-size:.95rem}
+textarea{min-height:90px;resize:vertical}
+button.btn{margin-top:12px;background:var(--btn);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-family:Manrope}
+button.btn.ghost{background:transparent;color:var(--roxo);border:1px solid var(--roxo)}
+.note{font-size:.78rem;color:var(--sub)}
+.locked{opacity:.55;filter:grayscale(.4)}
+.event-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.event-row:last-child{border-bottom:none}
+.date-chip{background:var(--roxo-l);color:var(--roxo);border-radius:10px;padding:6px 10px;text-align:center;min-width:54px;line-height:1.1}
+.date-chip b{display:block;font-size:1.3rem}.date-chip span{font-size:.65rem;font-weight:800}
+details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;background:var(--surface)}
+summary{cursor:pointer;font-weight:700}
+.ok-msg{color:var(--roxo);font-weight:700;font-size:.9rem;margin-top:8px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--surface);border-top:1px solid var(--line);padding:8px 4px calc(env(safe-area-inset-bottom,0px) + 8px)}
+nav button{flex:1;background:none;border:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.68rem;font-family:Manrope;cursor:pointer}
+nav button.active{color:var(--roxo);font-weight:800}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Grêmio Estudantil • [nome da escola]</div>
+  <h1>Revolução Estudantil em Ação</h1>
+  <p class="sub">Informação, participação e voz para todos.</p>
+  <a href="#" id="login-link" class="hero-login">Entrar como chapa/diretoria</a>
+</header>
+
+<div id="login-box" class="card" style="display:none;max-width:608px;margin:14px auto">
+  <h3>Login da chapa/diretoria</h3>
+  <label>E-mail</label><input id="lg-email" type="email">
+  <label>Senha</label><input id="lg-senha" type="password">
+  <button class="btn" onclick="fazerLogin()">Entrar</button>
+  <button class="btn ghost" onclick="document.getElementById('login-box').style.display='none'">Fechar</button>
+  <div class="ok-msg" id="lg-msg"></div>
+</div>
+
+<main id="main"></main>
+<nav id="nav"></nav>
+
+<script>
+const MAIN = ['inicio','jornal','calendario','formularios','mais'];
+const TABS = [
+  {id:'inicio', label:'Início', ic:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>'},
+  {id:'jornal', label:'Notícias', ic:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>'},
+  {id:'calendario', label:'Agenda', ic:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'},
+  {id:'formularios', label:'Participar', ic:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5.6L20 11l-5.6 2.4L12 19l-2.4-5.6L4 11l5.6-2.4z"/></svg>'},
+  {id:'mais', label:'Mais', ic:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>'},
+];
+
+const nav = document.getElementById('nav');
+const main = document.getElementById('main');
+let dbNs = null, userNs = null, isAdmin = false;
+
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+// ---- static content (edite aqui) ----
+const PROFESSORES = [
+  {nome:'Profa. [Nome]', materia:'Matemática'},
+  {nome:'Prof. [Nome]', materia:'Português'},
+  {nome:'Profa. [Nome]', materia:'História'},
+  {nome:'Prof. [Nome]', materia:'Ciências'},
+];
+const CHAPA = [
+  {nome:'[Seu nome]', cargo:'Presidente', bio:'Fale um pouco sobre você e por que quer representar os alunos.'},
+  {nome:'[Nome]', cargo:'Vice-presidente', bio:'Bio curta do integrante.'},
+  {nome:'[Nome]', cargo:'Secretário(a)', bio:'Bio curta do integrante.'},
+];
+const PROPOSTAS = [
+  {t:'Mais eventos culturais e esportivos', d:'Gincanas, campeonatos e festivais ao longo do ano.', s:'Planejado'},
+  {t:'Canal anônimo de sugestões e denúncias', d:'Caixa de sugestões e relato de bullying aqui no site.', s:'Em andamento'},
+  {t:'Guia da escola', d:'Explicar itinerários e Sala do Futuro de um jeito simples.', s:'Em andamento'},
+];
+const GUIA = [
+  {q:'O que são os Itinerários Formativos?', a:'São disciplinas eletivas que você escolhe além do currículo comum, focadas em áreas de interesse (ex: exatas, humanas, projeto de vida). Servem para aprofundar temas que combinam com o que você quer seguir depois da escola.'},
+  {q:'Para que servem os Itinerários?', a:'Ajudam a explorar interesses, desenvolver habilidades específicas e dão mais autonomia na sua formação, além de contar carga horária no seu histórico.'},
+  {q:'O que é a Sala do Futuro?', a:'É uma plataforma digital de apoio às aulas, com materiais, atividades e conteúdos organizados por disciplina, usada em conjunto com os Itinerários e o currículo regular.'},
+  {q:'Como acesso a Sala do Futuro?', a:'Entre pelo site ou app oficial com seu login de aluno (geralmente RA/matrícula + senha fornecida pela escola). Se não tiver o acesso, procure a secretaria ou a coordenação.'},
+];
+
+function go(id){ if(id!==state.tab) state.from=state.tab; state.tab=id; render(); window.scrollTo(0,0); }
+function render(){
+  nav.innerHTML = TABS.map(t=>{
+    const on = t.id===state.tab || (t.id==='mais' && !MAIN.includes(state.tab));
+    return `<button class="${on?'active':''}" onclick="go('${t.id}')">${t.ic}<span>${t.label}</span></button>`;
+  }).join('');
+  const back = MAIN.includes(state.tab) ? '' : `<a class="back" onclick="go('${state.from && state.from!==state.tab ? state.from : 'mais'}')">‹ Voltar</a>`;
+  main.innerHTML = back + SECTIONS[state.tab]();
+  wireTab(state.tab);
+}
+
+const state = {tab:'inicio',from:null, news:[], events:[], gamesInfo:null};
+
+const SECTIONS = {
+  inicio: ()=>`
+    <div class="card" id="destaque"><span class="pill">Em destaque</span>
+      <h3>Bem-vindo(a)!</h3><p>Notícias, agenda, projetos da chapa e um canal direto pra sua voz ser ouvida.</p>
+      <button class="btn" onclick="go('jornal')">Ver notícias</button></div>
+    <h3 style="margin-top:18px">Atalhos</h3>
+    <div class="grid2">
+      <button class="card sc" onclick="go('chapa')"><div class="ic">🗳️</div><b>Nossa Chapa</b><span class="note">Quem somos</span></button>
+      <button class="card sc" onclick="go('professores')"><div class="ic">👩‍🏫</div><b>Professores</b><span class="note">Conheça a equipe</span></button>
+      <button class="card sc" onclick="go('guia')"><div class="ic">📘</div><b>Guia da Escola</b><span class="note">Itinerários e mais</span></button>
+      <button class="card sc" onclick="go('jogos')"><div class="ic">🎮</div><b>Jogos</b><span class="note">Atividades do Grêmio</span></button>
+    </div>
+    <div class="sec-head"><h3>Aluno destaque</h3><a onclick="go('alunodestaque')">Ver mais</a></div>
+    <div class="card" id="inicio-aluno"><p class="note">Carregando…</p></div>
+    <div class="sec-head"><h3>Próximo evento</h3><a onclick="go('calendario')">Ver todos</a></div>
+    <div class="card" id="inicio-events"><p class="note">Carregando…</p></div>`,
+
+  jornal: ()=>`<h2>Jornal da Escola</h2><p>Notícias, avisos e o que está acontecendo por aqui.</p>
+    <div id="news-list"><p class="note">Carregando…</p></div>`,
+
+  professores: ()=>`<h2>Professores</h2>
+    <div class="grid2">${PROFESSORES.map(p=>`
+      <div class="card"><div class="avatar">${initials(p.nome)}</div>
+      <strong>${p.nome}</strong><p class="note">${p.materia}</p></div>`).join('')}</div>`,
+
+  chapa: ()=>`<h2>Nossa Chapa</h2><p>Quem somos e o que queremos fazer pela escola.</p>
+    ${CHAPA.map(c=>`<div class="card"><div class="avatar">${initials(c.nome)}</div>
+      <strong>${c.nome}</strong><p class="note" style="margin:0 0 6px">${c.cargo}</p><p>${c.bio}</p></div>`).join('')}
+    <h2 style="margin-top:18px">Projetos e propostas</h2>
+    ${PROPOSTAS.map(p=>`<div class="card"><span class="tag ${p.s==='Planejado'?'plan':''}">• ${p.s}</span><h3>${p.t}</h3><p>${p.d}</p></div>`).join('')}`,
+
+  mais: ()=>`<h2>Mais</h2>
+    <button class="card row" onclick="go('professores')"><span class="ic">👩‍🏫</span><b>Professores</b></button>
+    <button class="card row" onclick="go('chapa')"><span class="ic">🗳️</span><b>Nossa Chapa</b></button>
+    <button class="card row" onclick="go('alunodestaque')"><span class="ic">⭐</span><b>Aluno Destaque</b></button>
+    <button class="card row" onclick="go('projetos')"><span class="ic">🚀</span><b>Projetos</b></button>
+    <button class="card row" onclick="go('provapaulista')"><span class="ic">📝</span><b>Prova Paulista</b></button>
+    <button class="card row" onclick="go('guia')"><span class="ic">📘</span><b>Guia da Escola</b></button>
+    <button class="card row" onclick="go('jogos')"><span class="ic">🎮</span><b>Jogos do Grêmio</b></button>
+    ${isAdmin?`<button class="card row" onclick="go('painel')"><span class="ic">🔒</span><b>Painel da chapa</b></button>`:''}`,
+
+  alunodestaque: ()=>`<h2>Aluno Destaque</h2><p>Um espaço pra reconhecer quem se destaca na nossa escola — nos estudos, no esporte, na arte ou ajudando os colegas.</p>
+    <div class="card" id="ad-full"><p class="note">Carregando…</p></div>`,
+
+  projetos: ()=>`<h2>Projetos</h2><p>O que a escola e o grêmio estão desenvolvendo.</p>
+    <div id="projetos-list"><p class="note">Carregando…</p></div>`,
+
+  provapaulista: ()=>`<h2>Prova Paulista</h2>
+    <div class="card"><h3>O que é?</h3><p>É uma avaliação aplicada pela rede estadual de ensino de São Paulo para acompanhar o quanto os alunos aprenderam ao longo do período, em disciplinas como Língua Portuguesa e Matemática.</p></div>
+    <div class="card"><h3>Para que serve?</h3><p>O resultado ajuda a escola a identificar o que precisa ser reforçado nas aulas e também entra na avaliação do desempenho da turma e da escola dentro da rede estadual.</p></div>
+    <div class="card"><h3>Como se preparar</h3><p>• Revise o conteúdo dado em sala nas semanas anteriores<br>• Durma bem na noite anterior<br>• Leia cada questão com calma antes de responder<br>• Não deixe questões em branco — tente raciocinar mesmo na dúvida</p></div>
+    <div class="card"><h3>Datas</h3><p id="pp-datas">Fique de olho nos avisos da coordenação e na nossa <a href="#" onclick="go('calendario');return false" style="color:var(--roxo)">Agenda</a> para as datas oficiais deste período.</p></div>`,
+
+  calendario: ()=>`<h2>Calendário</h2><p>Provas, trabalhos e eventos.</p>
+    <div class="card" id="cal-list"><p class="note">Carregando…</p></div>`,
+
+  guia: ()=>`<h2>Guia da Escola</h2><p>Coisas que muita gente não entende direito, explicadas rápido.</p>
+    ${GUIA.map(g=>`<details><summary>${g.q}</summary><p style="margin-top:8px">${g.a}</p></details>`).join('')}`,
+
+  formularios: ()=>`<h2>Formulários</h2>
+    <div class="card"><h3>Acompanhamento do aluno</h3>
+      <p class="note">Peça ajuda, indique uma dificuldade ou situação que a coordenação/grêmio deveria saber.</p>
+      <label>Seu nome (opcional)</label><input id="ac-nome">
+      <label>Turma</label><input id="ac-turma">
+      <label>O que você quer contar?</label><textarea id="ac-texto"></textarea>
+      <button class="btn" onclick="enviar('acompanhamento',{nome:val('ac-nome'),turma:val('ac-turma'),texto:val('ac-texto')},'ac-msg')">Enviar</button>
+      <div class="ok-msg" id="ac-msg"></div></div>
+
+    <div class="card"><h3>Caixa de sugestões</h3>
+      <p class="note">Ideias para melhorar a escola ou o grêmio.</p>
+      <textarea id="sg-texto"></textarea>
+      <button class="btn" onclick="enviar('suggestions',{texto:val('sg-texto')},'sg-msg')">Enviar sugestão</button>
+      <div class="ok-msg" id="sg-msg"></div></div>
+
+    <div class="card"><h3>Relatar bullying</h3>
+      <p class="note">100% anônimo. Ninguém vai saber quem enviou — só a coordenação/grêmio vê o conteúdo.</p>
+      <textarea id="bl-texto" placeholder="Conte o que aconteceu, onde e quando, se souber."></textarea>
+      <button class="btn" onclick="enviar('bullying',{texto:val('bl-texto')},'bl-msg')">Enviar relato anônimo</button>
+      <div class="ok-msg" id="bl-msg"></div></div>`,
+
+  jogos: ()=>`<h2>Jogos e Atividades do Grêmio</h2><div id="jogos-box"><p class="note">Carregando…</p></div>`,
+
+  painel: ()=>`<h2>Painel da Chapa</h2><p class="note">Visível só para quem pode editar este site.</p>
+    <div class="card"><h3>Publicar aviso/notícia</h3>
+      <label>Título</label><input id="pn-titulo">
+      <label>Texto</label><textarea id="pn-texto"></textarea>
+      <button class="btn" onclick="publicarNews()">Publicar</button></div>
+    <div class="card"><h3>Adicionar ao calendário</h3>
+      <label>Título</label><input id="pe-titulo">
+      <label>Data</label><input id="pe-data" type="date">
+      <label>Tipo</label><select id="pe-tipo"><option>Prova</option><option>Trabalho</option><option>Evento</option><option>Outro</option></select>
+      <button class="btn" onclick="publicarEvento()">Adicionar</button></div>
+    <div class="card"><h3>Aluno destaque</h3>
+      <label>Nome</label><input id="pd-nome">
+      <label>Turma</label><input id="pd-turma">
+      <label>Motivo do destaque</label><textarea id="pd-motivo"></textarea>
+      <button class="btn" onclick="publicarDestaque()">Publicar</button></div>
+    <div class="card"><h3>Novo projeto</h3>
+      <label>Título</label><input id="pp-titulo">
+      <label>Descrição</label><textarea id="pp-texto"></textarea>
+      <button class="btn" onclick="publicarProjeto()">Publicar projeto</button></div>
+    <div class="card"><h3>Jogos do Grêmio — liberar em</h3>
+      <label>Data de liberação</label><input id="pg-data" type="date">
+      <label>Descrição</label><input id="pg-desc" placeholder="ex: Gincana do Grêmio">
+      <button class="btn" onclick="publicarJogos()">Salvar</button></div>
+    <div class="card"><h3>Sugestões recebidas</h3><div id="painel-sugg"><p class="note">Carregando…</p></div></div>
+    <div class="card"><h3>Relatos de bullying</h3><div id="painel-bully"><p class="note">Carregando…</p></div></div>
+    <div class="card"><h3>Acompanhamento de alunos</h3><div id="painel-ac"><p class="note">Carregando…</p></div></div>`,
+};
+
+function val(id){ return document.getElementById(id).value.trim(); }
+function dchip(d){ try{ const x=new Date(d+'T00:00'); return `<div class="date-chip"><b>${x.getDate()}</b><span>${x.toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase()}</span></div>`; }catch(e){return '';} }
+function fmtDate(d){ try{ return new Date(d+'T00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});}catch(e){return d;} }
+
+async function enviar(col, data, msgId){
+  const el = document.getElementById(msgId);
+  if(!dbNs){ el.textContent = 'Envio indisponível no momento.'; return; }
+  try{
+    await dbNs.collection(col).add({...data, createdAt: Date.now()});
+    el.textContent = 'Enviado! Obrigado.';
+    document.querySelectorAll('#'+msgId).forEach(()=>{});
+  }catch(e){ el.textContent = 'Não foi possível enviar agora, tenta de novo em instantes.'; }
+}
+
+async function publicarNews(){
+  const t=val('pn-titulo'), b=val('pn-texto'); if(!t||!b||!dbNs) return;
+  await dbNs.collection('news').add({titulo:t, texto:b, createdAt:Date.now()});
+  document.getElementById('pn-titulo').value=''; document.getElementById('pn-texto').value='';
+  loadNews();
+}
+async function publicarEvento(){
+  const t=val('pe-titulo'), d=document.getElementById('pe-data').value, tp=document.getElementById('pe-tipo').value;
+  if(!t||!d||!dbNs) return;
+  await dbNs.collection('calendar').add({titulo:t, data:d, tipo:tp});
+  document.getElementById('pe-titulo').value='';
+  loadEvents();
+}
+async function publicarDestaque(){
+  const nome=val('pd-nome'), turma=val('pd-turma'), motivo=val('pd-motivo');
+  if(!nome||!motivo||!dbNs) return;
+  await dbNs.doc('destaque/aluno').set({nome, turma, motivo, updatedAt:Date.now()});
+  document.getElementById('pd-nome').value=''; document.getElementById('pd-motivo').value='';
+  loadAlunoDestaque();
+}
+async function publicarProjeto(){
+  const t=val('pp-titulo'), b=val('pp-texto'); if(!t||!b||!dbNs) return;
+  await dbNs.collection('projetos').add({titulo:t, texto:b, createdAt:Date.now()});
+  document.getElementById('pp-titulo').value=''; document.getElementById('pp-texto').value='';
+  loadProjetos();
+}
+async function publicarJogos(){
+  const d=document.getElementById('pg-data').value, desc=val('pg-desc'); if(!d||!dbNs) return;
+  await dbNs.doc('games/status').set({unlockDate:d, desc});
+  loadJogos();
+}
+
+async function loadNews(){
+  if(!dbNs) return;
+  const snap = await dbNs.collection('news').orderBy('createdAt','desc').limit(20).get();
+  const items = snap.docs.map(d=>d.data());
+  const html = items.length ? items.map(n=>`<div class="card"><strong>${n.titulo}</strong><p>${n.texto}</p></div>`).join('')
+    : '<p class="note">Nenhum aviso publicado ainda.</p>';
+  const jl = document.getElementById('news-list'); if(jl) jl.innerHTML = html;
+  const dz = document.getElementById('destaque'); if(dz && items[0]) dz.innerHTML = `<span class="pill">Em destaque</span><h3>${items[0].titulo}</h3><p>${items[0].texto}</p><button class="btn" onclick="go('jornal')">Ver notícias</button>`;
+}
+async function loadEvents(){
+  if(!dbNs) return;
+  const snap = await dbNs.collection('calendar').orderBy('data','asc').limit(30).get();
+  const items = snap.docs.map(d=>d.data());
+  const rows = items.map(e=>`<div class="event-row">${dchip(e.data)}<div><strong>${e.titulo}</strong><br><span class="tag">• ${e.tipo}</span></div></div>`).join('');
+  const cl = document.getElementById('cal-list'); if(cl) cl.innerHTML = rows || '<p class="note">Nenhuma data cadastrada ainda.</p>';
+  const ie = document.getElementById('inicio-events'); if(ie){ const e=items.find(x=>x.data>=new Date().toISOString().slice(0,10))||items[0]; ie.innerHTML = e ? `<div class="event-row">${dchip(e.data)}<div><strong>${e.titulo}</strong><br><span class="tag">• ${e.tipo}</span></div></div>` : '<p class="note">Nenhum evento cadastrado ainda.</p>'; }
+}
+async function loadJogos(){
+  const box = document.getElementById('jogos-box'); if(!box) return;
+  if(!dbNs){ box.innerHTML = '<p class="note">Indisponível no momento.</p>'; return; }
+  const doc = await dbNs.doc('games/status').get();
+  const info = doc && doc.exists ? doc.data() : null;
+  if(!info || !info.unlockDate){ box.innerHTML = '<div class="card"><p>Nenhuma atividade programada ainda. Fique de olho!</p></div>'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  const unlocked = today >= info.unlockDate;
+  box.innerHTML = `<div class="card ${unlocked?'':'locked'}">
+    <span class="pill">${unlocked?'Liberado':'Bloqueado até '+fmtDate(info.unlockDate)}</span>
+    <h3>${info.desc||'Atividade do Grêmio'}</h3>
+    <p>${unlocked ? 'A atividade já está liberada — aproveite!' : 'Volte na data indicada para participar.'}</p></div>`;
+}
+async function loadAlunoDestaque(){
+  if(!dbNs) return;
+  const doc = await dbNs.doc('destaque/aluno').get();
+  const info = doc && doc.exists ? doc.data() : null;
+  const card = info ? `<div class="avatar">${initials(info.nome)}</div><strong>${info.nome}</strong>${info.turma?`<p class="note" style="margin:0 0 6px">${info.turma}</p>`:''}<p>${info.motivo}</p>`
+    : '<p class="note">Ainda sem aluno destaque cadastrado.</p>';
+  const home = document.getElementById('inicio-aluno'); if(home) home.innerHTML = card;
+  const full = document.getElementById('ad-full'); if(full) full.innerHTML = card;
+}
+async function loadProjetos(){
+  if(!dbNs) return;
+  const snap = await dbNs.collection('projetos').orderBy('createdAt','desc').limit(20).get();
+  const items = snap.docs.map(d=>d.data());
+  const html = items.length ? items.map(p=>`<div class="card"><h3>${p.titulo}</h3><p>${p.texto}</p></div>`).join('')
+    : '<p class="note">Nenhum projeto publicado ainda.</p>';
+  const el = document.getElementById('projetos-list'); if(el) el.innerHTML = html;
+}
+async function loadPainelLists(){
+  if(!dbNs || !isAdmin) return;
+  const map = [['suggestions','painel-sugg','texto'],['bullying','painel-bully','texto'],['acompanhamento','painel-ac','texto']];
+  for(const [col,elId] of map){
+    const snap = await dbNs.collection(col).orderBy('createdAt','desc').limit(20).get();
+    const el = document.getElementById(elId); if(!el) continue;
+    const items = snap.docs.map(d=>d.data());
+    el.innerHTML = items.length ? items.map(i=>`<div class="card" style="margin-bottom:8px"><p style="margin:0">${i.texto}</p>${i.nome?`<p class="note">${i.nome}${i.turma?' · '+i.turma:''}</p>`:''}</div>`).join('') : '<p class="note">Nada por aqui ainda.</p>';
+  }
+}
+
+function wireTab(tab){
+  if(tab==='inicio'){ loadNews(); loadEvents(); loadAlunoDestaque(); }
+  if(tab==='jornal') loadNews();
+  if(tab==='calendario') loadEvents();
+  if(tab==='jogos') loadJogos();
+  if(tab==='alunodestaque') loadAlunoDestaque();
+  if(tab==='projetos') loadProjetos();
+  if(tab==='painel') loadPainelLists();
+}
+
+// ===== CONFIGURAÇÃO DO FIREBASE =====
+// Cole aqui o firebaseConfig que o console do Firebase te dá (veja SETUP.md)
+const firebaseConfig = {
+  apiKey: "AIzaSyAZLd2BT3jbheZwjZYoKkr3feVT938btY4",
+  authDomain: "gremio-f624e.firebaseapp.com",
+  projectId: "gremio-f624e",
+  storageBucket: "gremio-f624e.firebasestorage.app",
+  messagingSenderId: "260488775985",
+  appId: "1:260488775985:web:d2509acf0ea69e5d330810",
+  measurementId: "G-4GFC03J9Z1"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+
+// dbNs replica a mesma API usada no resto do código (collection/doc, add/get/set)
+dbNs = {
+  collection: (name) => ({
+    add: (data) => firestore.collection(name).add(data),
+    orderBy: (field, dir) => ({
+      limit: (n) => ({
+        get: async () => {
+          const snap = await firestore.collection(name).orderBy(field, dir).limit(n).get();
+          return { docs: snap.docs.map(d => ({ data: () => d.data() })) };
+        }
+      })
+    })
+  }),
+  doc: (path) => ({
+    set: (data) => firestore.doc(path).set(data, { merge: true }),
+    get: async () => {
+      const d = await firestore.doc(path).get();
+      return { exists: d.exists, data: () => d.data() };
+    }
+  })
+};
+
+async function fazerLogin(){
+  const email = val('lg-email'), senha = document.getElementById('lg-senha').value;
+  const msg = document.getElementById('lg-msg');
+  try{
+    await auth.signInWithEmailAndPassword(email, senha);
+    document.getElementById('login-box').style.display = 'none';
+  }catch(e){ msg.textContent = 'Erro: ' + (e.code || e.message); console.error(e); }
+}
+document.getElementById('login-link').onclick = (e) => {
+  e.preventDefault();
+  if(isAdmin){ auth.signOut(); }
+  else document.getElementById('login-box').style.display = 'block';
+};
+
+async function boot(){
+  render();
+  auth.onAuthStateChanged(async (user) => {
+    if(user){
+      const adminDoc = await firestore.collection('admins').doc(user.uid).get();
+      isAdmin = adminDoc.exists;
+      document.getElementById('login-link').textContent = isAdmin ? 'Sair (' + user.email + ')' : 'Entrar como chapa/diretoria';
+    } else {
+      isAdmin = false;
+      document.getElementById('login-link').textContent = 'Entrar como chapa/diretoria';
+    }
+    if(!SECTIONS[state.tab]) state.tab='inicio';
+    if(state.tab==='painel' && !isAdmin) state.tab='inicio';
+    render();
+  });
+}
+boot();
+</script>
+</body>
+</html>
